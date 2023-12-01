@@ -55,8 +55,8 @@ pub fn get_arguments() -> (String, String, String) {
 }
 
 pub fn read_data_file(
-    day: String,
-    data_set: String,
+    day: &String,
+    data_set: &String,
 ) -> String {
     match fs::read_to_string(format!(
         "input/day_{day}/{data_set}.txt"
