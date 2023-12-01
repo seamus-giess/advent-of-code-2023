@@ -1,4 +1,5 @@
 use colored::Colorize;
+use regex::Regex;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
@@ -66,8 +67,6 @@ fn main() {
         }
     }
 
-    println!("Data:\n\"{data_content}\"\n");
-
     let exploded = data_content.split("\n");
 
     let text_digits = HashMap::from([
@@ -94,28 +93,25 @@ fn main() {
     ]);
 
     let mut sum = 0;
+    let reg_ex: Regex = Regex::new(r"zero|one|two|three|four|five|six|seven|eight|nine|\d").unwrap();
     for line in exploded.into_iter() {
-        let mut found_digits = HashMap::new();
-        for digit in text_digits.clone().into_iter() {
-            if let Some(first_index) = line.find(digit.0) {
-                found_digits.insert(first_index, digit.1);
-            };
-            if let Some(last_index) = line.rfind(digit.0) {
-                found_digits.insert(last_index, digit.1);
-            };
-        }
-
-        let lowest = found_digits
-            .get(found_digits.keys().min().unwrap())
+        let matches = reg_ex.captures(line).unwrap();
+        let first = text_digits
+            .get(matches.get(0).unwrap().as_str())
             .unwrap();
-        let highest = found_digits
-            .get(found_digits.keys().max().unwrap())
+        let last = text_digits
+            .get(
+                matches
+                    .get(matches.len() - 1)
+                    .unwrap()
+                    .as_str(),
+            )
             .unwrap();
 
-        let joined = (lowest * 10) + highest;
+        let joined = (first * 10) + last;
         sum += joined;
     }
-    println!("{}", sum);
+    println!("Solution: {}", sum);
 
     // let mut sum: u32 = 0;
     // exploded.for_each(|x| {
