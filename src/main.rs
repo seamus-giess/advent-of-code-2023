@@ -1,49 +1,14 @@
 use colored::Colorize;
 use regex::Regex;
 use std::collections::HashMap;
-use std::env;
-use std::fs;
 use std::time::Instant;
 
+pub mod services;
+use services::command_helpers;
+
 fn main() {
-    // benchmarking
-    let now = Instant::now();
-
-    let args: Vec<String> = env::args().collect();
-
-    let day: &String;
-    match args.get(1) {
-        Some(data) => day = data,
-        None => {
-            println!(
-                "Missing {} parameter!\nExiting...",
-                "day".red(),
-            );
-            std::process::exit(1);
-        }
-    }
-    let part: &String;
-    match args.get(2) {
-        Some(data) => part = data,
-        None => {
-            println!(
-                "Missing {} parameter!\nExiting...",
-                "part".red(),
-            );
-            std::process::exit(1);
-        }
-    }
-    let mut data_set = &String::from("example");
-    match args.get(3) {
-        Some(data) => data_set = data,
-        None => {
-            println!(
-                "Missing {} parameter. Using \"{}\"\n",
-                "data_set".red(),
-                "example".yellow(),
-            )
-        }
-    }
+    let (day, part, data_set) =
+        command_helpers::get_arguments();
 
     println!(
         "Doing Day {}, Part {} with {} data.\n",
@@ -52,23 +17,12 @@ fn main() {
         data_set.green(),
     );
 
-    let data_content;
-    match fs::read_to_string(format!(
-        "input/day_{day}/{data_set}.txt"
-    )) {
-        Ok(content) => data_content = content,
-        Err(_) => {
-            println!(
-                "Error reading file: \"input/{}/{}\"\nDoes it exist?",
-                format!("day_{day}").red(),
-                format!("{data_set}.txt").red()
-            );
-            std::process::exit(1);
-        }
-    }
+    let data =
+        command_helpers::read_data_file(day, data_set);
 
-    let exploded = data_content.split("\n");
+    let exploded = data.split("\n");
 
+    let start = Instant::now(); // benchmarking start
     let text_digits = HashMap::from([
         ("zero", 0),
         ("0", 0),
@@ -111,17 +65,15 @@ fn main() {
         let joined = (first * 10) + last;
         sum += joined;
     }
-    println!("Solution: {}", sum);
+    let done = start.elapsed(); // benchmarking end
 
-    // let mut sum: u32 = 0;
-    // exploded.for_each(|x| {
-    //     let first = x.chars().next().unwrap().to_digit(10).unwrap();
-    //     let last = x.chars().last().unwrap().to_digit(10).unwrap();
-    //     sum += (first * 10) + last;
-    //     println!("{}, {}, {}", sum, (first * 10), last)
-    // });
-    // println!("{}", sum);
-    // Do a thing
-
-    println!("Elapsed: {:.2?}", now.elapsed());
+    println!(
+        "{}",
+        format!(" Solution: {} ", sum.to_string())
+            .on_green()
+    );
+    println!(
+        "Elapsed: {}",
+        format!(" {:.2?} ", done).on_blue()
+    );
 }
