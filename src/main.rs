@@ -2,15 +2,22 @@ use colored::Colorize;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+use std::time::Instant;
 
 fn main() {
+    // benchmarking
+    let now = Instant::now();
+
     let args: Vec<String> = env::args().collect();
 
     let day: &String;
     match args.get(1) {
         Some(data) => day = data,
         None => {
-            println!("Missing {} parameter!\nExiting...", "day".red(),);
+            println!(
+                "Missing {} parameter!\nExiting...",
+                "day".red(),
+            );
             std::process::exit(1);
         }
     }
@@ -18,18 +25,23 @@ fn main() {
     match args.get(2) {
         Some(data) => part = data,
         None => {
-            println!("Missing {} parameter!\nExiting...", "part".red(),);
+            println!(
+                "Missing {} parameter!\nExiting...",
+                "part".red(),
+            );
             std::process::exit(1);
         }
     }
     let mut data_set = &String::from("example");
     match args.get(3) {
         Some(data) => data_set = data,
-        None => println!(
-            "Missing {} parameter. Using \"{}\"\n",
-            "data_set".red(),
-            "example".yellow(),
-        ),
+        None => {
+            println!(
+                "Missing {} parameter. Using \"{}\"\n",
+                "data_set".red(),
+                "example".yellow(),
+            )
+        }
     }
 
     println!(
@@ -40,7 +52,9 @@ fn main() {
     );
 
     let data_content;
-    match fs::read_to_string(format!("input/day_{day}/{data_set}.txt")) {
+    match fs::read_to_string(format!(
+        "input/day_{day}/{data_set}.txt"
+    )) {
         Ok(content) => data_content = content,
         Err(_) => {
             println!(
@@ -56,7 +70,7 @@ fn main() {
 
     let exploded = data_content.split("\n");
 
-    let textDigits = HashMap::from([
+    let text_digits = HashMap::from([
         ("zero", 0),
         ("0", 0),
         ("one", 1),
@@ -81,22 +95,27 @@ fn main() {
 
     let mut sum = 0;
     for line in exploded.into_iter() {
-        let mut foundDigits = HashMap::new();
-        for digit in textDigits.clone().into_iter() {
-            if let Some(firstIndex) = line.find(digit.0) {
-                foundDigits.insert(firstIndex, digit.1);
+        let mut found_digits = HashMap::new();
+        for digit in text_digits.clone().into_iter() {
+            if let Some(first_index) = line.find(digit.0) {
+                found_digits.insert(first_index, digit.1);
             };
-            if let Some(lastIndex) = line.rfind(digit.0) {
-                foundDigits.insert(lastIndex, digit.1);
+            if let Some(last_index) = line.rfind(digit.0) {
+                found_digits.insert(last_index, digit.1);
             };
         }
-        let lowest = foundDigits.get(foundDigits.keys().min().unwrap()).unwrap();
-        let highest = foundDigits.get(foundDigits.keys().max().unwrap()).unwrap();
+
+        let lowest = found_digits
+            .get(found_digits.keys().min().unwrap())
+            .unwrap();
+        let highest = found_digits
+            .get(found_digits.keys().max().unwrap())
+            .unwrap();
 
         let joined = (lowest * 10) + highest;
         sum += joined;
-        println!("{}, {}", joined, sum);
     }
+    println!("{}", sum);
 
     // let mut sum: u32 = 0;
     // exploded.for_each(|x| {
@@ -107,4 +126,6 @@ fn main() {
     // });
     // println!("{}", sum);
     // Do a thing
+
+    println!("Elapsed: {:.2?}", now.elapsed());
 }
