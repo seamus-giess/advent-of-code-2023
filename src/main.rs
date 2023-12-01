@@ -1,4 +1,5 @@
 use colored::Colorize;
+use std::collections::HashMap;
 use std::env;
 use std::fs;
 
@@ -53,25 +54,57 @@ fn main() {
 
     println!("Data:\n\"{data_content}\"\n");
 
-    let letterless = data_content.replace(
-        &[
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        ][..],
-        "",
-    );
+    let exploded = data_content.split("\n");
 
-    println!("{letterless}");
+    let textDigits = HashMap::from([
+        ("zero", 0),
+        ("0", 0),
+        ("one", 1),
+        ("1", 1),
+        ("two", 2),
+        ("2", 2),
+        ("three", 3),
+        ("3", 3),
+        ("four", 4),
+        ("4", 4),
+        ("five", 5),
+        ("5", 5),
+        ("six", 6),
+        ("6", 6),
+        ("seven", 7),
+        ("7", 7),
+        ("eight", 8),
+        ("8", 8),
+        ("nine", 9),
+        ("9", 9),
+    ]);
 
-    let exploded = letterless.split("\n");
+    let mut sum = 0;
+    for line in exploded.into_iter() {
+        let mut foundDigits = HashMap::new();
+        for digit in textDigits.clone().into_iter() {
+            if let Some(firstIndex) = line.find(digit.0) {
+                foundDigits.insert(firstIndex, digit.1);
+            };
+            if let Some(lastIndex) = line.rfind(digit.0) {
+                foundDigits.insert(lastIndex, digit.1);
+            };
+        }
+        let lowest = foundDigits.get(foundDigits.keys().min().unwrap()).unwrap();
+        let highest = foundDigits.get(foundDigits.keys().max().unwrap()).unwrap();
 
-    let mut sum: u32 = 0;
-    exploded.for_each(|x| {
-        let first = x.chars().next().unwrap().to_digit(10).unwrap();
-        let last = x.chars().last().unwrap().to_digit(10).unwrap();
-        sum += (first * 10) + last;
-        println!("{}, {}, {}", sum, (first * 10), last)
-    });
-    println!("{}", sum);
+        let joined = (lowest * 10) + highest;
+        sum += joined;
+        println!("{}, {}", joined, sum);
+    }
+
+    // let mut sum: u32 = 0;
+    // exploded.for_each(|x| {
+    //     let first = x.chars().next().unwrap().to_digit(10).unwrap();
+    //     let last = x.chars().last().unwrap().to_digit(10).unwrap();
+    //     sum += (first * 10) + last;
+    //     println!("{}, {}, {}", sum, (first * 10), last)
+    // });
+    // println!("{}", sum);
     // Do a thing
 }
