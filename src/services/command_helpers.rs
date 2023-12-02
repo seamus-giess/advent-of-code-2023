@@ -15,10 +15,7 @@ pub fn get_arguments() -> (String, String, String) {
     match args.get(1) {
         Some(data) => day = data,
         None => {
-            println!(
-                "Missing {} parameter!\nExiting...",
-                "day".red(),
-            );
+            println!("Missing {} parameter!\nExiting...", "day".red(),);
             process::exit(1);
         }
     }
@@ -27,10 +24,7 @@ pub fn get_arguments() -> (String, String, String) {
     match args.get(2) {
         Some(data) => part = data,
         None => {
-            println!(
-                "Missing {} parameter!\nExiting...",
-                "part".red(),
-            );
+            println!("Missing {} parameter!\nExiting...", "part".red(),);
             process::exit(1);
         }
     }
@@ -47,20 +41,11 @@ pub fn get_arguments() -> (String, String, String) {
         }
     }
 
-    return (
-        day.to_string(),
-        part.to_string(),
-        data_set.to_string(),
-    );
+    return (day.to_string(), part.to_string(), data_set.to_string());
 }
 
-pub fn read_data_file(
-    day: &String,
-    data_set: &String,
-) -> String {
-    match fs::read_to_string(format!(
-        "input/day_{day}/{data_set}.txt"
-    )) {
+pub fn read_data_file(day: &String, data_set: &String) -> String {
+    match fs::read_to_string(format!("input/day_{day}/{data_set}.txt")) {
         Ok(content) => return content,
         Err(_) => {
             println!(
