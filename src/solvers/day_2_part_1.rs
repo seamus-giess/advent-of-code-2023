@@ -11,17 +11,17 @@ impl Game {
             .cube_reveals
             .clone()
             .into_iter()
-            .fold(true, |reveal_valid, cube_reveal| {
+            .fold(true, |is_reveal_valid, cube_reveal| {
                 return cube_reveal.into_iter().fold(
-                    reveal_valid,
-                    |counts_valid, (key, cube_count)| {
+                    is_reveal_valid,
+                    |is_counts_valid, (key, cube_count)| {
                         let limit = match key.as_str() {
                             "red" => 12,
                             "green" => 13,
                             "blue" => 14,
                             _ => panic!("Invalid color!"),
                         };
-                        return counts_valid && cube_count <= limit;
+                        return is_counts_valid && (cube_count <= limit);
                     },
                 );
             });
