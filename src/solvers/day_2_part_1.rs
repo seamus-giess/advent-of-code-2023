@@ -51,7 +51,7 @@ pub fn solve(data: &String) -> String {
     }
 
     let mut sum: i32 = 0;
-    for (game_label, counts) in possible_games.into_iter() {
+    for (game_label, _) in possible_games.into_iter() {
         let game_id: i32 = game_label
             .split(" ")
             .last()

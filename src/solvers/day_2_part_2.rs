@@ -46,9 +46,9 @@ pub fn solve(data: &String) -> String {
     }
 
     let mut sum: i32 = 0;
-    for (game, minimums) in game_minimums.into_iter() {
+    for (_game, minimums) in game_minimums.into_iter() {
         let mut game_power: i32 = 1;
-        for (color, minimum) in minimums.into_iter() {
+        for (_color, minimum) in minimums.into_iter() {
             game_power = game_power * minimum;
         }
         sum += game_power;
