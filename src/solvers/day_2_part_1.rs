@@ -55,7 +55,6 @@ impl std::str::FromStr for Game {
         cube_set_strings.for_each(|cube_set_string| {
             let mut cube_set: HashMap<String, i32> = HashMap::new();
             cube_set_string.split(", ").for_each(|cube_set_string| {
-                println!("{:?}", cube_set_string);
                 match cube_set_string.split_once(" ") {
                     Some((count, label)) => cube_set.insert(
                         label.to_string(),
