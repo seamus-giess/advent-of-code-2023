@@ -1,49 +1,98 @@
 use std::collections::HashMap;
 
-pub fn solve(data: &String) -> String {
-    let exploded = data.split("\n");
+#[derive(Debug)]
+struct Game {
+    id: i32,
+    cube_reveals: Vec<HashMap<String, i32>>,
+}
+impl Game {
+    pub fn is_valid(&self) -> bool {
+        return self
+            .cube_reveals
+            .clone()
+            .into_iter()
+            .fold(true, |reveal_valid, cube_reveal| {
+                return cube_reveal.into_iter().fold(
+                    reveal_valid,
+                    |counts_valid, (key, cube_count)| {
+                        let limit = match key.as_str() {
+                            "red" => 12,
+                            "green" => 13,
+                            "blue" => 14,
+                            _ => panic!("Invalid color!"),
+                        };
+                        return counts_valid && cube_count <= limit;
+                    },
+                );
+            });
+    }
+}
 
-    let mut possible_games: HashMap<&str, Vec<HashMap<&str, i32>>> = HashMap::new();
+struct GameParseError;
+impl std::str::FromStr for Game {
+    type Err = GameParseError;
 
-    'lines: for line in exploded.into_iter() {
-        let mut line_fragments = line.split(": ");
+    fn from_str(string: &str) -> Result<Game, GameParseError> {
+        let (game_name, cube_set_strings) = match string.split_once(": ") {
+            Some((game_name, cube_set_strings)) => (
+                match game_name.replace("Game ", "").parse::<i32>() {
+                    Ok(id) => id,
+                    Err(_error) => panic!("Couldn't parse game id."),
+                },
+                cube_set_strings.split("; "),
+            ),
+            None => return Err(GameParseError),
+        };
 
-        let game_name = line_fragments.next().unwrap();
-        let reveal_strings = line_fragments.next().unwrap().split("; ");
-
-        let mut game_cube_counts: Vec<HashMap<&str, i32>> = Vec::new();
-        for reveal_string in reveal_strings.into_iter() {
-            let cube_reveals = reveal_string.split(", ");
-            let mut cube_count = HashMap::from([("red", 0), ("green", 0), ("blue", 0)]);
-            for reveal in cube_reveals.into_iter() {
-                let mut split_cube_count = reveal.split(" ").into_iter();
-                let value = split_cube_count.next().unwrap().parse::<i32>().unwrap();
-                let key = split_cube_count.last().unwrap();
-
-                let limit = match key {
-                    "red" => 12,
-                    "green" => 13,
-                    // "blue" => 14,
-                    _ => panic!("Invalid color!"),
+        /*
+            Parse: "red: 1, green 2, blue 3; red 4, green 5, blue 6"
+            Into: [
+                {"red": 1, "green": 2, "blue": 3},
+                {"red": 4, "green": 5, "blue": 6},
+            ]
+        */
+        let mut cube_reveals: Vec<HashMap<String, i32>> = Vec::new();
+        cube_set_strings.for_each(|cube_set_string| {
+            let mut cube_set: HashMap<String, i32> = HashMap::new();
+            cube_set_string.split(", ").for_each(|cube_set_string| {
+                println!("{:?}", cube_set_string);
+                match cube_set_string.split_once(" ") {
+                    Some((count, label)) => cube_set.insert(
+                        label.to_string(),
+                        match count.parse() {
+                            Ok(count) => count,
+                            _ => panic!("Can't parse set count to i32"),
+                        },
+                    ),
+                    _ => panic!("Can't split cube map: Game"),
                 };
-                if value > limit {
-                    continue 'lines;
-                }
+            });
+            cube_reveals.push(cube_set);
+        });
 
-                cube_count.insert(key, value);
-            }
-            game_cube_counts.push(cube_count);
-        }
-        possible_games.insert(game_name, game_cube_counts);
+        return Ok(Game {
+            id: game_name,
+            cube_reveals: cube_reveals,
+        });
     }
+}
 
-    let mut sum: i32 = 0;
-    for (game_label, _) in possible_games.into_iter() {
-        let game_id: i32 = game_label.split(" ").last().unwrap().parse().unwrap();
-        sum += game_id;
-    }
+pub fn solve(data: &String) -> String {
+    let lines = data.split("\n");
 
-    println!("{:?}", sum);
+    let games = lines.map(|line| {
+        return match line.parse::<Game>() {
+            Ok(game) => game,
+            Err(_error) => panic!("Couldn't parse game."),
+        };
+    });
 
-    return String::from("0"); //sum.to_string();
+    let valid_games = games.filter(|game| {
+        return game.is_valid();
+    });
+    return valid_games
+        .fold(0, |sum, game| {
+            return sum + game.id;
+        })
+        .to_string();
 }
