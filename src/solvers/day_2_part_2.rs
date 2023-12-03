@@ -6,30 +6,8 @@ struct Game {
     cube_reveals: Vec<HashMap<String, i32>>,
 }
 impl Game {
-    #[allow(dead_code)]
-    pub fn is_valid(&self) -> bool {
-        return self
-            .cube_reveals
-            .clone()
-            .into_iter()
-            .fold(true, |is_reveal_valid, cube_reveal| {
-                return cube_reveal.into_iter().fold(
-                    is_reveal_valid,
-                    |is_counts_valid, (key, cube_count)| {
-                        let limit = match key.as_str() {
-                            "red" => 12,
-                            "green" => 13,
-                            "blue" => 14,
-                            _ => panic!("Invalid color!"),
-                        };
-                        return is_counts_valid && (cube_count <= limit);
-                    },
-                );
-            });
-    }
-
-    pub fn min_cubes_required(&self) -> HashMap<String, i32> {
-        return self.cube_reveals.clone().into_iter().fold(
+    pub fn min_cubes_required(self) -> HashMap<String, i32> {
+        return self.cube_reveals.into_iter().fold(
             HashMap::new(),
             |minimum_cubes: HashMap<String, i32>, cube_count| {
                 let mut new_minimums = minimum_cubes.clone();
@@ -47,7 +25,7 @@ impl Game {
         );
     }
 
-    pub fn get_power(&self) -> i32 {
+    pub fn get_power(self) -> i32 {
         return self
             .min_cubes_required()
             .into_iter()
