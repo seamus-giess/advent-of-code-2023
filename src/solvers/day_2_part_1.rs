@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 
+use itertools::FoldWhile::{Continue, Done};
+use itertools::Itertools;
+
 #[derive(Debug)]
 struct Game {
     id: i32,
@@ -11,20 +14,30 @@ impl Game {
             .cube_reveals
             .clone()
             .into_iter()
-            .fold(true, |is_reveal_valid, cube_reveal| {
-                return cube_reveal.into_iter().fold(
-                    is_reveal_valid,
-                    |is_counts_valid, (key, cube_count)| {
+            .fold_while(true, |is_reveal_valid, cube_reveal| {
+                let is_counts_valid = cube_reveal
+                    .into_iter()
+                    .fold_while(is_reveal_valid, |_is_counts_valid, (key, cube_count)| {
                         let limit = match key.as_str() {
                             "red" => 12,
                             "green" => 13,
                             "blue" => 14,
                             _ => panic!("Invalid color!"),
                         };
-                        return is_counts_valid && (cube_count <= limit);
-                    },
-                );
-            });
+                        return if cube_count <= limit {
+                            Continue(true)
+                        } else {
+                            Done(false)
+                        };
+                    })
+                    .into_inner();
+                return if is_counts_valid {
+                    Continue(is_counts_valid)
+                } else {
+                    Done(is_counts_valid)
+                };
+            })
+            .into_inner();
     }
 }
 
