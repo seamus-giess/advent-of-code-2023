@@ -24,8 +24,6 @@ impl Grid {
             .map(|(adj_x, adj_y)| {
                 return self.get_full_number(adj_x, adj_y);
             })
-            .collect::<Vec<i32>>()
-            .into_iter()
             .unique()
             .fold(0, |acc, num| return acc + num);
     }

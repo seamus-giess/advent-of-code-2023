@@ -24,17 +24,13 @@ impl Grid {
             .map(|(adj_x, adj_y)| {
                 return self.get_full_number(adj_x, adj_y);
             })
-            .collect::<Vec<i32>>()
-            .into_iter()
             .unique()
             .filter(|value| return value.clone() != (0 as i32))
             .collect();
 
         if adjacent_parts.len() != 2 {
-            println!("gear does not have 2 parts D:, {:?}", adjacent_parts);
             return 0;
         }
-        println!("gear has 2 parts :D");
 
         return adjacent_parts.into_iter().fold(1, |acc, part_number| {
             return acc * part_number;
@@ -50,7 +46,7 @@ impl Grid {
         let mut right_shift: usize = 1;
         loop {
             match self.rows[y].get(x + right_shift) {
-                None | Some('.') => break, // Effectively "break;"
+                None | Some('.') => break,
                 Some(symbol) => {
                     if let Some(_is_not_num) = digits.find(symbol.to_string().as_str()) {
                         break;
