@@ -1,5 +1,7 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 
+use itertools::Itertools;
+
 pub fn solve(data: &String) -> String {
     let mut sum = 0;
     let card_strings = data.split('\n');
@@ -27,23 +29,22 @@ pub fn solve(data: &String) -> String {
         };
         cards.insert(card_id, (winning_numbers, your_numbers));
     });
-    let mut won_cards_count = HashMap::new();
-    won_cards_count.insert(1, 1);
-    won_cards.push_back(1);
+    let mut won_cards_count: HashMap<i32, i32> = HashMap::new();
+    let mut won_cards: VecDeque<i32> = VecDeque::new();
+    cards.keys().for_each(|key| {
+        won_cards.push_back(key.clone());
+    });
     while won_cards.len() > 0 {
         let next_card = won_cards.pop_front().unwrap();
-        println!("resolving: {:?}, stack: {:?}", next_card, won_cards);
+        won_cards_count.insert(
+            next_card,
+            match won_cards_count.get(&next_card) {
+                Some(count) => count + 1,
+                None => 1,
+            },
+        );
         let (winning_numbers, your_numbers) = cards.get(&next_card).unwrap();
         let wins = winning_numbers.intersection(your_numbers);
-        wins.clone().for_each(|&won_card| {
-            won_cards_count.insert(
-                won_card.parse().unwrap(),
-                match won_cards_count.get(&won_card.parse().unwrap()) {
-                    Some(count) => count + 1,
-                    None => 1,
-                },
-            );
-        });
         let wins_count: i32 = wins.count() as i32;
         let mut counter = 0;
         while counter < wins_count {
