@@ -1,8 +1,9 @@
 use std::str::FromStr;
-use std::time::Instant;
 
 use itertools::Itertools;
 use regex::Regex;
+
+const DIGITS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 struct Grid {
     rows: Vec<Vec<char>>,
@@ -39,8 +40,8 @@ impl Grid {
             match self.rows[y].get(x + right_shift) {
                 None | Some('.') => break, // Effectively "break;"
                 Some(symbol) => {
-                    match symbol {
-                        '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+                    match DIGITS.contains(symbol) {
+                        true => {
                             number_string.push(symbol.clone());
                             right_shift += 1;
                         }
@@ -54,8 +55,8 @@ impl Grid {
         loop {
             match self.rows[y].get(x - left_shift) {
                 None | Some('.') => break,
-                Some(symbol) => match symbol {
-                    '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+                Some(symbol) => match DIGITS.contains(symbol) {
+                    true => {
                         number_string.insert(0, symbol.clone());
                         left_shift += 1;
                     }
