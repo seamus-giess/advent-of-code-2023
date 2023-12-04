@@ -3,6 +3,8 @@ use std::str::FromStr;
 use itertools::Itertools;
 use regex::Regex;
 
+const DIGITS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
 struct Grid {
     rows: Vec<Vec<char>>,
 }
@@ -41,18 +43,19 @@ impl Grid {
             '.' => return 0,
             char => char.to_string(),
         };
-        let digits: Regex = Regex::new(r"[^0-9]").unwrap();
 
         let mut right_shift: usize = 1;
         loop {
             match self.rows[y].get(x + right_shift) {
-                None | Some('.') => break,
+                None | Some('.') => break, // Effectively "break;"
                 Some(symbol) => {
-                    if let Some(_is_not_num) = digits.find(symbol.to_string().as_str()) {
-                        break;
+                    match DIGITS.contains(symbol) {
+                        true => {
+                            number_string.push(symbol.clone());
+                            right_shift += 1;
+                        }
+                        _ => break,
                     };
-                    number_string.push(symbol.clone());
-                    right_shift += 1;
                 }
             };
         }
@@ -61,13 +64,13 @@ impl Grid {
         loop {
             match self.rows[y].get(x - left_shift) {
                 None | Some('.') => break,
-                Some(symbol) => {
-                    if let Some(_is_not_num) = digits.find(symbol.to_string().as_str()) {
-                        break;
-                    };
-                    number_string.insert(0, symbol.clone());
-                    left_shift += 1;
-                }
+                Some(symbol) => match DIGITS.contains(symbol) {
+                    true => {
+                        number_string.insert(0, symbol.clone());
+                        left_shift += 1;
+                    }
+                    _ => break,
+                },
             };
         }
         return number_string.parse().unwrap();
@@ -89,25 +92,24 @@ impl FromStr for Grid {
         return Ok(Grid { rows: grid });
     }
 }
-
 pub fn solve(data: &String) -> String {
-    let grid = match data.parse::<Grid>() {
+    let grid = match data.clone().parse::<Grid>() {
         Ok(grid) => grid,
         _ => panic!("Failed to make the grid!"),
     };
 
-    let symbols: Regex = Regex::new(r"[^*]").unwrap();
+    let symbols: Regex = Regex::new(r"[*]").unwrap();
+
+    let line_length = data.find('\n').unwrap();
 
     let mut sum = 0;
-    for (y, row) in grid.rows.clone().into_iter().enumerate() {
-        for (x, symbol) in row.into_iter().enumerate() {
-            if let Some(_is_skippable) = symbols.find(symbol.to_string().as_str()) {
-                continue;
-            };
-
+    symbols
+        .find_iter(data.clone().replace('\n', "").as_str())
+        .for_each(|symbol| {
+            let x = symbol.start() % line_length;
+            let y = (symbol.start()) / line_length;
             sum += grid.get_adjacent_numbers(x, y);
-        }
-    }
+        });
 
     return sum.to_string();
 }
