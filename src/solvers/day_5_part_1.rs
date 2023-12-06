@@ -96,13 +96,20 @@ pub fn solve(data: &String) -> String {
     object.seeds.into_iter().map(|seed| {
         let new_seed = seed.clone();
 
-        object.
+        object
+            .processes
+            .clone()
+            .into_iter()
+            .fold(seed, |from_value, process| {
+                return from_value;
+            });
     });
     object.seeds.into_iter().for_each(|seed| {
         locations.push(object.processes.into_iter().fold(
             seed,
             |current_location, step: (&str, &str)| {
-                return processes
+                return object
+                    .processes
                     .get(&step)
                     .unwrap()
                     .into_iter()
