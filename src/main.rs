@@ -7,11 +7,7 @@ use services::command_helpers;
 pub mod solvers;
 
 fn main() {
-    // let (day, part, data_set) = command_helpers::get_arguments();
-
-    let day = "7".to_string();
-    let part = "1".to_string();
-    let data_set = "real".to_string();
+    let (day, part, data_set) = command_helpers::get_arguments();
 
     println!(
         "Doing Day {}, Part {} with {} data.\n",

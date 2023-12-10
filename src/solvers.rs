@@ -14,6 +14,8 @@ pub mod day_6_part_1;
 pub mod day_6_part_2;
 pub mod day_7_part_1;
 pub mod day_7_part_2;
+pub mod day_8_part_1;
+pub mod day_8_part_2;
 
 pub fn solve(day: &String, part: &String, data: &String) -> String {
     match format!("{},{}", day, part).as_str() {
@@ -31,6 +33,8 @@ pub fn solve(day: &String, part: &String, data: &String) -> String {
         "6,2" => return day_6_part_2::solve(data),
         "7,1" => return day_7_part_1::solve(data),
         "7,2" => return day_7_part_2::solve(data),
+        "8,1" => return day_8_part_1::solve(data),
+        "8,2" => return day_8_part_2::solve(data),
         _ => {
             println!(
                 "Solver {} not found!\nExiting...",
